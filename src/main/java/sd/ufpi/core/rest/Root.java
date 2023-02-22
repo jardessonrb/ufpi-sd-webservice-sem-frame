@@ -1,5 +1,6 @@
 package sd.ufpi.core.rest;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +8,9 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import sd.ufpi.core.exceptions.AtributteNotFoundException;
+import sd.ufpi.core.exceptions.AttributeNotFoundException;
+import sd.ufpi.core.rest.anotations.GetMapping;
+import sd.ufpi.core.rest.anotations.RequestMapping;
 
 public class Root implements HttpHandler {
     private Map<String, RootController> controllers;
@@ -28,30 +31,57 @@ public class Root implements HttpHandler {
     }
 
     public void addController(RootController controller){
-        if(controller.getPath() == null){
-            throw new AtributteNotFoundException("Controller is not contain path");
+
+        Class<?> classe = controller.getClass();
+
+        RequestMapping request = classe.getAnnotation(RequestMapping.class);
+        String path = null;
+        if(request != null){
+            path = request.path();
+            path = path.split("/")[1];
         }
 
-        if(this.controllers.containsKey(controller.getPath())){
-            throw new AtributteNotFoundException("Path alread exists");
+        if(path == null){
+            throw new AttributeNotFoundException("Controller is not contain path");
         }
 
-        this.controllers.put(controller.getPath(), controller);
+        if(this.controllers.containsKey(path)){
+            throw new AttributeNotFoundException("Path alread exists");
+        }
+
+
+        this.controllers.put(path, controller);
     }
     
     private String splitPath(URI uriRequest){
         String path[] = uriRequest.toString().split("/");
 
+        for(int i = 0; i < path.length; i++){
+            System.out.println(i + " = "+path[i]);
+        }
         System.out.println("Path: "+path[1]+" si "+path.length);
         return path[1];
     }
 
     private Object getResultExecute(String path){
         if(!this.controllers.containsKey(path)){
-            throw new AtributteNotFoundException("Controller is not contain path");
+            throw new AttributeNotFoundException("Controller is not contain path");
         }
 
         RootController controller = this.controllers.get(path);
         return controller.execute();
+    }
+
+    private RootController getController(String path){
+        RootController controller = this.controllers.get(path);
+
+        Class<?> classe = controller.getClass();
+        for(Method method : classe.getDeclaredMethods()){
+            GetMapping getMapping = method.getAnnotation(GetMapping.class);
+            System.out.println("GetMapping Value:" +getMapping.path());
+        }
+        
+
+        return null;
     }
 }

@@ -1,13 +1,11 @@
 package sd.ufpi.controllers;
 
 import sd.ufpi.core.rest.RootController;
+import sd.ufpi.core.rest.anotations.GetMapping;
+import sd.ufpi.core.rest.anotations.RequestMapping;
 
+@RequestMapping(path = "/user")
 public class UserController implements RootController {
-    private String path = "user";
-
-    public String getPath() {
-        return this.path;
-    }
 
     public Object execute() {
         StringBuilder builder = new StringBuilder();
@@ -17,6 +15,11 @@ public class UserController implements RootController {
         builder.append("}");
 
         return builder.toString();
+    }
+
+    @GetMapping(path = "/name")
+    public String buscarNome(){
+        return "Járdesson Ribeiro";
     }
     
 }

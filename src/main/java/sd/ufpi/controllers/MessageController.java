@@ -1,13 +1,10 @@
 package sd.ufpi.controllers;
 
 import sd.ufpi.core.rest.RootController;
+import sd.ufpi.core.rest.anotations.RequestMapping;
 
+@RequestMapping(path = "/message")
 public class MessageController implements RootController{
-    private String path = "message";
-
-    public String getPath() {
-        return this.path;
-    }
 
     public Object execute() {
         StringBuilder builder = new StringBuilder();
