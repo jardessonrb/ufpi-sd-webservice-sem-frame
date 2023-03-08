@@ -12,7 +12,7 @@ public class Server {
     private HttpServer servidor = null;
 
     public Server(int porta, HttpHandler handler) throws IOException {
-        this.servidor = HttpServer.create(new InetSocketAddress(porta), 0);
+        this.servidor = HttpServer.create(new InetSocketAddress(porta), 5);
 
         this.servidor.createContext(CONTEXTO_DEFAULT, handler);
     }
@@ -28,5 +28,4 @@ public class Server {
     public void stop(){
         this.servidor.stop(1);
     }
-
 }

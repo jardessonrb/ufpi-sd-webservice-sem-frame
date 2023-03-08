@@ -1,10 +1,12 @@
 package sd.ufpi.core.rest;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -20,6 +22,15 @@ public class Root implements HttpHandler {
     }
 
     public void handle(HttpExchange exchange) throws IOException {
+        System.out.println("Chegou");
+        HttpParse parse = new HttpParse();
+        Request request = parse.parse(exchange);
+        Gson gson = new Gson();
+        System.out.println(gson.toJson(request));
+
+        System.out.println(exchange.getRequestURI());
+        System.out.println(exchange.getRequestMethod());
+
         
         String path = splitPath(exchange.getRequestURI());
         
@@ -68,8 +79,26 @@ public class Root implements HttpHandler {
             throw new AttributeNotFoundException("Controller is not contain path");
         }
 
-        RootController controller = this.controllers.get(path);
-        return controller.execute();
+        Class<?> controllerClass = this.controllers.get(path).getClass();
+
+        String message = "message";
+        for(Method method : controllerClass.getMethods()){
+            GetMapping get = method.getAnnotation(GetMapping.class);
+            if(get != null){
+                if(message.equals(get.path().split("/")[1])){
+                    try {
+                        String valor = (String)method.invoke(this.controllers.get(path) , null);
+
+                        return "{\"valor\":\""+valor+"\"}";
+                        
+                    } catch (Exception e) {
+                        System.out.println("Deu erro");
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     private RootController getController(String path){
