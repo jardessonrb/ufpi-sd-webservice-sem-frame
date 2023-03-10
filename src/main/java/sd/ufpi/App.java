@@ -18,10 +18,12 @@ import sd.ufpi.application.repository.UsuarioRepository;
 import sd.ufpi.core.database.ConnectionFactory;
 import sd.ufpi.core.rest.Root;
 import sd.ufpi.core.rest.Server;
+import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
+import sd.ufpi.core.rest.exceptions.ClassNotController;
 
 public class App
 {
-    public static void main( String[] args ) throws IOException, SQLException
+    public static void main( String[] args ) throws IOException, SQLException, ClassNotController, ClassControllerAlreadyExists
     {
         Root root = new Root();
         root.addController(new UserController());

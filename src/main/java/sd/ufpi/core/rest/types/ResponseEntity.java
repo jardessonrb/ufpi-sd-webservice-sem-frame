@@ -1,4 +1,4 @@
-package sd.ufpi.core.rest.tipos;
+package sd.ufpi.core.rest.types;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
