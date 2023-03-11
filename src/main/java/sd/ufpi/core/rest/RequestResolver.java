@@ -2,6 +2,7 @@ package sd.ufpi.core.rest;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 import sd.ufpi.core.exceptions.AttributeNotFoundException;
 import sd.ufpi.core.rest.anotations.GetMapping;
+import sd.ufpi.core.rest.anotations.PathParam;
 import sd.ufpi.core.rest.anotations.RequestMethod;
 import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
 import sd.ufpi.core.rest.types.Request;
@@ -16,10 +18,12 @@ import sd.ufpi.core.rest.types.Request;
 public class RequestResolver {
     private Map<String, Object> controllers;
     private HttpParse parse;
+    private MapperParametersManager mapperParametersManager;
 
     public RequestResolver(){
         this.controllers = new HashMap<>();
         this.parse       = new HttpParse();
+        this.mapperParametersManager = new MapperParametersManager();
     }
 
     public void addController(String pathMapping, Object controller) throws ClassControllerAlreadyExists{
@@ -31,7 +35,7 @@ public class RequestResolver {
     }
 
     public Object resolver(Request request) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-        List<String> paths = request.getParamsPath();
+        List<String> paths = request.getPaths();
 
         Object controller = getController(paths.get(0));
 
@@ -62,12 +66,24 @@ public class RequestResolver {
 
     private Object executeGET(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
         Class<?> controllerClass = controller.getClass();
+
         for(Method method : controllerClass.getMethods()){
             GetMapping get = method.getAnnotation(GetMapping.class);
             if(get != null){
                 List<PathParams> pathParams = this.parse.tranformUriInPathParams(get.path());
-                if(isCorrespondingRequest(request.getParamsPath(), pathParams)){
-                    Object resultado = (Object)method.invoke(controller , null);
+                if(isCorrespondingRequest(request, pathParams)){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+
+                    /*
+                     * method.getParameters() retorna todos os parametros, tem que caçar uma forma de mapear para cada um dele e passar em ordem
+                     */
+
+                     System.out.println("Opa");
+                    
+                    Object resultado = (Object)method.invoke(controller , parametrosMapeado);
 
                     return resultado;
 
@@ -78,17 +94,20 @@ public class RequestResolver {
         return null;
     }
 
-    private boolean isCorrespondingRequest(List<String> paths, List<PathParams> pathParams){
-        if((pathParams.size() + 1) != paths.size()){
+    private boolean isCorrespondingRequest(Request request, List<PathParams> pathParams){
+        request.getPathParams().clear();
+        if((pathParams.size() + 1) != request.getPaths().size()){
             return false;
         }
         for (int i = 0; i < pathParams.size(); i++) {
-            if(i < paths.size()){
+            if(i < request.getPaths().size()){
                 if(!pathParams.get(i).isParams()){
-                    System.out.println(pathParams.get(i).getValue()+" = "+paths.get(i + 1 ));
-                    if(!pathParams.get(i).getValue().equals(paths.get(i + 1))){
+                    System.out.println(pathParams.get(i).getValue()+" = "+request.getPaths().get(i + 1 ));
+                    if(!pathParams.get(i).getValue().equals(request.getPaths().get(i + 1))){
                         return false;
                     }
+                }else {
+                    request.getPathParams().add(request.getPaths().get(i + 1 ));
                 }
             }
         }

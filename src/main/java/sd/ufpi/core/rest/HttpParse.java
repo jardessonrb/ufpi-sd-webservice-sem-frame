@@ -6,8 +6,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 
 import com.google.gson.Gson;
@@ -21,12 +23,14 @@ public class HttpParse {
     public Request parse(HttpExchange requisicao) throws IOException{
         List<String> paths = getPaths(requisicao.getRequestURI().toString());
         Map<String, String> queryParams = getQueryParams(requisicao.getRequestURI().toString());
+        Queue<String> pathParams = getPathParams(requisicao.getRequestURI().toString());
         
         Request request = new Request();
         request.setBody(parseBody(requisicao));
         request.setMethod(requisicao.getRequestMethod());
         request.setQueryParams(queryParams);
         request.setPaths(paths);
+        request.setPathParams(pathParams);
         return request;
     }
 
@@ -114,6 +118,18 @@ public class HttpParse {
         return false;
     }
 
+    public Queue<String> getPathParams(String uri){
+        List<PathParams> pathParams = tranformUriInPathParams(uri);
+        Queue<String> pathParamsQueue = new LinkedList<>();
+        pathParams.forEach(path -> {
+            if(path.isParams()){
+                pathParamsQueue.add(path.getValue());
+            }
+        });
+
+        return pathParamsQueue;
+    }
+
 
     public static void main(String[] args) {
         HttpParse parse = new HttpParse();
@@ -122,9 +138,13 @@ public class HttpParse {
         String url = "casa/"+uuid.toString()+"/cozinha/sala/teste?page=0&limit=10&";
         List<String> paths = parse.getPaths(url);
         Map<String, String> queryParams= parse.getQueryParams(url);
-        String uri = "/teste/{ispathparam}/algumacoisa";
+        String uri = "/teste/{ispathparam}/{outros}/algumacoisa";
 
         List<PathParams> listPathParams = parse.tranformUriInPathParams(uri);
+        Queue<String> filaPath = parse.getPathParams(uri);
+
+        System.out.println("Fila 01" +filaPath.remove());
+        System.out.println("Fila 02" +filaPath.remove());
 
         listPathParams.forEach(path -> {
             System.out.println("Valor: "+path.getValue()+" is path param "+path.isParams());

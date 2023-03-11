@@ -2,20 +2,24 @@ package sd.ufpi.core.rest.types;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import sd.ufpi.core.rest.anotations.RequestMethod;
 
 public class Request {
     private Map<String, String> paramsQuery;
-    private List<String> paramsPath;
+    private List<String> paths;
     private Object body;
     private RequestMethod method;
+    private Queue<String> paramsPath;
 
     public Request(){
         this.paramsQuery = new HashMap<>();
-        this.paramsPath = new ArrayList<>();
+        this.paths = new ArrayList<String>();
+        this.paramsPath = new LinkedList<String>();
     }
 
     public void setMethod(String method){
@@ -27,18 +31,25 @@ public class Request {
     }
 
     public void setPaths(List<String> paths){
-        this.paramsPath = paths;
+        this.paths = paths;
     }
 
     public void setQueryParams(Map<String, String> queries){
         this.paramsQuery = queries;
     }
 
-    public List<String> getParamsPath(){
-        return this.paramsPath;
+    public List<String> getPaths(){
+        return this.paths;
     }
 
     public RequestMethod getRequestMethod(){
         return this.method;
+    } 
+
+    public void setPathParams(Queue<String> params){
+        this.paramsPath = params;
+    }
+    public Queue<String> getPathParams(){
+        return this.paramsPath;
     }
 }
