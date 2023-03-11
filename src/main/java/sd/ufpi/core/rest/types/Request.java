@@ -14,12 +14,12 @@ public class Request {
     private List<String> paths;
     private Object body;
     private RequestMethod method;
-    private Queue<String> paramsPath;
+    private Map<String, String> paramsPath;
 
     public Request(){
         this.paramsQuery = new HashMap<>();
         this.paths = new ArrayList<String>();
-        this.paramsPath = new LinkedList<String>();
+        this.paramsPath = new HashMap<>();
     }
 
     public void setMethod(String method){
@@ -46,10 +46,10 @@ public class Request {
         return this.method;
     } 
 
-    public void setPathParams(Queue<String> params){
+    public void setPathParams(Map<String, String> params){
         this.paramsPath = params;
     }
-    public Queue<String> getPathParams(){
+    public Map<String, String> getPathParams(){
         return this.paramsPath;
     }
 }

@@ -11,6 +11,8 @@ import sd.ufpi.core.exceptions.AttributeNotFoundException;
 import sd.ufpi.core.rest.anotations.RequestMapping;
 import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
 import sd.ufpi.core.rest.exceptions.ClassNotController;
+import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
+import sd.ufpi.core.rest.exceptions.ValueIsRequiredInAnotation;
 import sd.ufpi.core.rest.types.Request;
 
 public class Root extends RequestResolver implements HttpHandler {
@@ -32,7 +34,7 @@ public class Root extends RequestResolver implements HttpHandler {
             exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
             exchange.getResponseBody().write(json.toString().getBytes());
             exchange.close();
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | UnparsedValueForTargetType | ClassNotFoundException | ValueIsRequiredInAnotation e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }

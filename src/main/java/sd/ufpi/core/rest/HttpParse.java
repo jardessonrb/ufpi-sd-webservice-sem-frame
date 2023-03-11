@@ -23,7 +23,7 @@ public class HttpParse {
     public Request parse(HttpExchange requisicao) throws IOException{
         List<String> paths = getPaths(requisicao.getRequestURI().toString());
         Map<String, String> queryParams = getQueryParams(requisicao.getRequestURI().toString());
-        Queue<String> pathParams = getPathParams(requisicao.getRequestURI().toString());
+        Map<String, String> pathParams = getPathParams(requisicao.getRequestURI().toString());
         
         Request request = new Request();
         request.setBody(parseBody(requisicao));
@@ -90,8 +90,6 @@ public class HttpParse {
         }
 
         String request = new String(builder.toString().getBytes(), charset);
-        // Gson gson = new Gson();
-        // MensagemForm body = gson.fromJson(request, MensagemForm.class);
         return request;
     }
 
@@ -100,10 +98,26 @@ public class HttpParse {
         List<PathParams> pathParams = new ArrayList<>();
 
         paths.forEach(path -> {
-            pathParams.add(new PathParams(containsPathParam(path), path));
+            if(containsPathParam(path)){
+                pathParams.add(new PathParams(true, path, extractKey(path)));
+            }else {
+                pathParams.add(new PathParams(false, path, path));
+            }
+            
         });
 
         return pathParams;
+    }
+
+    public String extractKey(String path){
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < path.length(); i++) {
+            if(path.charAt(i) != '{' && path.charAt(i) != '}'){
+                builder.append(path.charAt(i));
+            }
+        }
+
+        return builder.toString();
     }
 
     public boolean containsPathParam(String path){
@@ -118,12 +132,12 @@ public class HttpParse {
         return false;
     }
 
-    public Queue<String> getPathParams(String uri){
+    public Map<String, String> getPathParams(String uri){
         List<PathParams> pathParams = tranformUriInPathParams(uri);
-        Queue<String> pathParamsQueue = new LinkedList<>();
+        Map<String, String> pathParamsQueue = new HashMap<>();
         pathParams.forEach(path -> {
             if(path.isParams()){
-                pathParamsQueue.add(path.getValue());
+                pathParamsQueue.put(path.getKey(), path.getValue());
             }
         });
 
@@ -141,10 +155,7 @@ public class HttpParse {
         String uri = "/teste/{ispathparam}/{outros}/algumacoisa";
 
         List<PathParams> listPathParams = parse.tranformUriInPathParams(uri);
-        Queue<String> filaPath = parse.getPathParams(uri);
-
-        System.out.println("Fila 01" +filaPath.remove());
-        System.out.println("Fila 02" +filaPath.remove());
+        Map<String, String> filaPath = parse.getPathParams(uri);
 
         listPathParams.forEach(path -> {
             System.out.println("Valor: "+path.getValue()+" is path param "+path.isParams());

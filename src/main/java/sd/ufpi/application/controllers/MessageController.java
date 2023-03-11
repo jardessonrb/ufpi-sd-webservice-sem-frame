@@ -8,12 +8,12 @@ import sd.ufpi.core.rest.anotations.RequestMapping;
 public class MessageController {
 
     @GetMapping(path = "/nome/{nome}/idade/{idade}")
-    public Object testeDeMensagem(@PathParam(name = "nome") String valor, @PathParam(name = "idade") String idade) {
-        return new Teste(valor, idade);
+    public Object testeDeMensagem(@PathParam(name = "idade") Integer idade, @PathParam(name = "nome") String nome) {
+        return new Teste(nome, idade);
     }
 
     @GetMapping(path = "/message/{nome}")
-    public String getMessage(@PathParam String nome){
+    public String getMessage(@PathParam(name = "nome") String nome){
         return "Eu quero ver o nome passado "+nome;
     }
 }
@@ -21,7 +21,7 @@ public class MessageController {
 class Teste {
     public String name;
     
-    public Teste(String nome, String idade){
+    public Teste(String nome, Integer idade){
         this.name = "Meu nome é "+nome+" e tenho "+idade+" anos";
     }
 }

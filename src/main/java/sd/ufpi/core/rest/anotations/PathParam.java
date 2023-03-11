@@ -9,4 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PathParam {
     String name() default "";
+
+    String erroMessage() default "Value is required";
 }

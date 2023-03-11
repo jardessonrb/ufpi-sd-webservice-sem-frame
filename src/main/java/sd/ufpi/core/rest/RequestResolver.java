@@ -13,6 +13,8 @@ import sd.ufpi.core.rest.anotations.GetMapping;
 import sd.ufpi.core.rest.anotations.PathParam;
 import sd.ufpi.core.rest.anotations.RequestMethod;
 import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
+import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
+import sd.ufpi.core.rest.exceptions.ValueIsRequiredInAnotation;
 import sd.ufpi.core.rest.types.Request;
 
 public class RequestResolver {
@@ -34,7 +36,7 @@ public class RequestResolver {
         this.controllers.put(pathMapping, controller);
     }
 
-    public Object resolver(Request request) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+    public Object resolver(Request request) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
         List<String> paths = request.getPaths();
 
         Object controller = getController(paths.get(0));
@@ -64,7 +66,7 @@ public class RequestResolver {
         // return null;
     }
 
-    private Object executeGET(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+    private Object executeGET(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
         Class<?> controllerClass = controller.getClass();
 
         for(Method method : controllerClass.getMethods()){
@@ -80,8 +82,6 @@ public class RequestResolver {
                     /*
                      * method.getParameters() retorna todos os parametros, tem que caçar uma forma de mapear para cada um dele e passar em ordem
                      */
-
-                     System.out.println("Opa");
                     
                     Object resultado = (Object)method.invoke(controller , parametrosMapeado);
 
@@ -102,12 +102,11 @@ public class RequestResolver {
         for (int i = 0; i < pathParams.size(); i++) {
             if(i < request.getPaths().size()){
                 if(!pathParams.get(i).isParams()){
-                    System.out.println(pathParams.get(i).getValue()+" = "+request.getPaths().get(i + 1 ));
                     if(!pathParams.get(i).getValue().equals(request.getPaths().get(i + 1))){
                         return false;
                     }
                 }else {
-                    request.getPathParams().add(request.getPaths().get(i + 1 ));
+                    request.getPathParams().put(pathParams.get(i).getKey(), request.getPaths().get(i + 1 ));
                 }
             }
         }
