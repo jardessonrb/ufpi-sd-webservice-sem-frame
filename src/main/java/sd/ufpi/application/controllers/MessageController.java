@@ -1,8 +1,10 @@
 package sd.ufpi.application.controllers;
 
+import sd.ufpi.application.domain.form.MensagemForm;
 import sd.ufpi.core.rest.anotations.GetMapping;
 import sd.ufpi.core.rest.anotations.PathParam;
 import sd.ufpi.core.rest.anotations.QueryParam;
+import sd.ufpi.core.rest.anotations.RequestBody;
 import sd.ufpi.core.rest.anotations.RequestMapping;
 
 @RequestMapping(path = "/message")
@@ -17,8 +19,10 @@ public class MessageController {
     public String getMessage(
             @PathParam(name = "nome") String nome, 
             @QueryParam(name = "page") Integer page,  
-            @QueryParam(name = "limit") Integer limit){
-
+            @QueryParam(name = "limit") Integer limit,
+            @RequestBody MensagemForm form){
+        
+        System.out.println(form.toString());
         return "Eu quero ver o nome passado "+nome+" com uma pagina de "+page+" limit "+limit;
     }
 }

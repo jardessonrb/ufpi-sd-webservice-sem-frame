@@ -10,7 +10,6 @@ import java.util.Map;
 
 import sd.ufpi.core.exceptions.AttributeNotFoundException;
 import sd.ufpi.core.rest.anotations.GetMapping;
-import sd.ufpi.core.rest.anotations.PathParam;
 import sd.ufpi.core.rest.anotations.RequestMethod;
 import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
 import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;

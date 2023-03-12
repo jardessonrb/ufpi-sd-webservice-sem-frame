@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sd.ufpi.application.model.UsuarioModel;
+import sd.ufpi.application.domain.model.UsuarioModel;
 import sd.ufpi.core.database.ConnectionFactory;
 
 public class UsuarioRepository {

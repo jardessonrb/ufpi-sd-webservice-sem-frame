@@ -13,7 +13,7 @@ import java.util.List;
 
 import sd.ufpi.application.controllers.MessageController;
 import sd.ufpi.application.controllers.UserController;
-import sd.ufpi.application.model.UsuarioModel;
+import sd.ufpi.application.domain.model.UsuarioModel;
 import sd.ufpi.application.repository.UsuarioRepository;
 import sd.ufpi.core.database.ConnectionFactory;
 import sd.ufpi.core.rest.Root;

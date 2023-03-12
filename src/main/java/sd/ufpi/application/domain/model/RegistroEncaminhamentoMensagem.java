@@ -1,4 +1,4 @@
-package sd.ufpi.application.model;
+package sd.ufpi.application.domain.model;
 
 public class RegistroEncaminhamentoMensagem {
 	private Long id;

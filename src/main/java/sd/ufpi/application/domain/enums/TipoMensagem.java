@@ -1,4 +1,4 @@
-package sd.ufpi.application.enums;
+package sd.ufpi.application.domain.enums;
 
 public enum TipoMensagem {
 	ORIGINAL,

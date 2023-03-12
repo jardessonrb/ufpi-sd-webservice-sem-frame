@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import sd.ufpi.application.enums.SituacaoMensagem;
-import sd.ufpi.application.enums.TipoMensagem;
-import sd.ufpi.application.model.MensagemModel;
+import sd.ufpi.application.domain.enums.SituacaoMensagem;
+import sd.ufpi.application.domain.enums.TipoMensagem;
+import sd.ufpi.application.domain.model.MensagemModel;
 import sd.ufpi.core.database.ConnectionFactory;
 import sd.ufpi.core.utils.DatesUtils;
 

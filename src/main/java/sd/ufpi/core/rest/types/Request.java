@@ -2,17 +2,15 @@ package sd.ufpi.core.rest.types;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import sd.ufpi.core.rest.anotations.RequestMethod;
 
 public class Request {
     private Map<String, String> paramsQuery;
     private List<String> paths;
-    private Object body;
+    private String body;
     private RequestMethod method;
     private Map<String, String> paramsPath;
 
@@ -26,7 +24,7 @@ public class Request {
         this.method = RequestMethod.valueOf(method);
     }
 
-    public void setBody(Object body){
+    public void setBody(String body){
         this.body = body;
     }
 
@@ -56,5 +54,9 @@ public class Request {
 
     public Map<String, String> getQueryParams(){
         return this.paramsQuery;
+    }
+
+    public String getBody(){
+        return this.body;
     }
 }

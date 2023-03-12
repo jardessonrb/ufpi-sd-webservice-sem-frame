@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 
 import sd.ufpi.core.rest.anotations.PathParam;
 import sd.ufpi.core.rest.anotations.QueryParam;
+import sd.ufpi.core.rest.anotations.RequestBody;
 import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
 import sd.ufpi.core.rest.exceptions.ValueIsRequiredInAnotation;
 import sd.ufpi.core.rest.types.Request;
@@ -46,6 +47,13 @@ public class MapperParametersManager {
                     parametersMapped[i] = parseTypeObject(request.getQueryParams().get(queryParam.name()), parameters[i]);
                     continue;
                 }
+            }
+
+            RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
+            if(requestBody != null){
+                System.out.println(request.getBody());
+                parametersMapped[i] = parseTypeObject(request.getBody(), parameters[i]);
+                continue;
             }
         }
 

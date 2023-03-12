@@ -6,16 +6,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.UUID;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 
-import sd.ufpi.core.forms.MensagemForm;
 import sd.ufpi.core.rest.types.Request;
 
 public class HttpParse {
@@ -80,7 +76,7 @@ public class HttpParse {
         return queryParams;
     }
 
-    public Object parseBody(HttpExchange requisicao) throws IOException{
+    public String parseBody(HttpExchange requisicao) throws IOException{
         Charset charset = StandardCharsets.UTF_8;
         InputStream input = requisicao.getRequestBody();
         StringBuilder builder = new StringBuilder();

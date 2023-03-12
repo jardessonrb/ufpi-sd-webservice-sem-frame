@@ -1,4 +1,4 @@
-package sd.ufpi.application.model;
+package sd.ufpi.application.domain.model;
 
 public class UsuarioModel {
     private Long id;

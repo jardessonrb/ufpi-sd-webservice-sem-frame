@@ -1,10 +1,10 @@
-package sd.ufpi.application.model;
+package sd.ufpi.application.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import sd.ufpi.application.enums.SituacaoMensagem;
-import sd.ufpi.application.enums.TipoMensagem;
+import sd.ufpi.application.domain.enums.SituacaoMensagem;
+import sd.ufpi.application.domain.enums.TipoMensagem;
 
 public class MensagemModel {
 	
