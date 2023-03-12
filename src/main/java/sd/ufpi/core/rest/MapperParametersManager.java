@@ -5,6 +5,7 @@ import java.lang.reflect.Parameter;
 import com.google.gson.Gson;
 
 import sd.ufpi.core.rest.anotations.PathParam;
+import sd.ufpi.core.rest.anotations.QueryParam;
 import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
 import sd.ufpi.core.rest.exceptions.ValueIsRequiredInAnotation;
 import sd.ufpi.core.rest.types.Request;
@@ -18,7 +19,6 @@ public class MapperParametersManager {
 
     public Object[] parse(Request request, Parameter parameters[]) throws UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
         Object parametersMapped[] = new Object[parameters.length];
-        System.out.println("Quantos elementos na fila de paths: "+request.getPathParams().size());
         for (int i = 0; i < parameters.length; i++) {
             PathParam pathParam = parameters[i].getAnnotation(PathParam.class);
             if(pathParam != null){
@@ -28,6 +28,24 @@ public class MapperParametersManager {
                 }
                 parametersMapped[i] = parseTypeObject(request.getPathParams().get(pathParam.name()), parameters[i]);
                 continue;
+            }
+
+            QueryParam queryParam = parameters[i].getAnnotation(QueryParam.class);
+            if(queryParam != null){
+                String key = queryParam.name();
+                String value = request.getQueryParams().get(key);
+
+                if(value == null){
+                    if(queryParam.isRequired()){
+                        throw new ValueIsRequiredInAnotation(queryParam.erroMessage());
+                    }else {
+                        parametersMapped[i] = value;
+                        continue;
+                    }
+                }else {
+                    parametersMapped[i] = parseTypeObject(request.getQueryParams().get(queryParam.name()), parameters[i]);
+                    continue;
+                }
             }
         }
 

@@ -49,7 +49,12 @@ public class Request {
     public void setPathParams(Map<String, String> params){
         this.paramsPath = params;
     }
+
     public Map<String, String> getPathParams(){
         return this.paramsPath;
+    }
+
+    public Map<String, String> getQueryParams(){
+        return this.paramsQuery;
     }
 }
