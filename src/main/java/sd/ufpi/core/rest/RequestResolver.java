@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 import sd.ufpi.core.exceptions.AttributeNotFoundException;
 import sd.ufpi.core.rest.anotations.GetMapping;
 import sd.ufpi.core.rest.anotations.RequestMethod;
@@ -15,16 +17,20 @@ import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
 import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
 import sd.ufpi.core.rest.exceptions.ValueIsRequiredInAnotation;
 import sd.ufpi.core.rest.types.Request;
+import sd.ufpi.core.rest.types.ResponseEntity;
+import sd.ufpi.core.rest.types.ResponseErro;
 
 public class RequestResolver {
     private Map<String, Object> controllers;
     private HttpParse parse;
     private MapperParametersManager mapperParametersManager;
+    private Gson jsonParseManager;
 
     public RequestResolver(){
         this.controllers = new HashMap<>();
         this.parse       = new HttpParse();
         this.mapperParametersManager = new MapperParametersManager();
+        this.jsonParseManager = new Gson();
     }
 
     public void addController(String pathMapping, Object controller) throws ClassControllerAlreadyExists{
@@ -36,16 +42,26 @@ public class RequestResolver {
     }
 
     public Object resolver(Request request) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
+        ResponseEntity<?> result = null;
+        
         List<String> paths = request.getPaths();
-
         Object controller = getController(paths.get(0));
+        try {
+            if(request.getRequestMethod().equals(RequestMethod.GET)){
+                result = executeGET(request, controller);
+            }
 
-        if(request.getRequestMethod().equals(RequestMethod.GET)){
-            Object result = executeGET(request, controller);
-            return result;
+            Object resultJson = this.jsonParseManager.toJson(result);
+            return resultJson;
+            
+        } catch (Exception e) {
+            ResponseEntity<ResponseErro> responseErro = new ResponseEntity<>();
+            responseErro = responseErro.erro(new ResponseErro(e.getMessage()), 500);
+            Object erro = this.jsonParseManager.toJson(responseErro);
+            return erro;
+            
         }
         
-        return "Deu bom";
     }
 
     private Object getController(String path){
@@ -65,7 +81,7 @@ public class RequestResolver {
         // return null;
     }
 
-    private Object executeGET(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
+    private ResponseEntity<?> executeGET(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
         Class<?> controllerClass = controller.getClass();
 
         for(Method method : controllerClass.getMethods()){
@@ -82,7 +98,7 @@ public class RequestResolver {
                      * method.getParameters() retorna todos os parametros, tem que caçar uma forma de mapear para cada um dele e passar em ordem
                      */
                     
-                    Object resultado = (Object)method.invoke(controller , parametrosMapeado);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
 
                     return resultado;
 

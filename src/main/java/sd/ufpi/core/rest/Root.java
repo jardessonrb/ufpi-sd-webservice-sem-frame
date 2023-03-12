@@ -21,18 +21,14 @@ public class Root extends RequestResolver implements HttpHandler {
     }
 
     public void handle(HttpExchange exchange) throws IOException {
-        Gson gson = new Gson();
-        System.out.println("Chegou");
         HttpParse parse = new HttpParse();
         Request request = parse.parse(exchange);
-        System.out.println(gson.toJson(request));
         Object resultado;
         try {
             resultado = resolver(request);
-            Object json = gson.toJson(resultado);
-            exchange.sendResponseHeaders(200, json.toString().length());
+            exchange.sendResponseHeaders(200, resultado.toString().length());
             exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-            exchange.getResponseBody().write(json.toString().getBytes());
+            exchange.getResponseBody().write(resultado.toString().getBytes());
             exchange.close();
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | UnparsedValueForTargetType | ClassNotFoundException | ValueIsRequiredInAnotation e) {
             System.out.println(e.getMessage());

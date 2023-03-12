@@ -1,35 +1,26 @@
 package sd.ufpi.core.rest.types;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
 public class ResponseEntity<T> {
     private int status;
     private T body;
 
-    public void created(T body){
-        this.status = 201;
+    public ResponseEntity(){}
+
+    public ResponseEntity<T> created(T body){
         this.body = body;
+        this.status = 201;
+
+        return this;
     }
 
+    public ResponseEntity<T> erro(T body, int status){
+        this.body = body;
+        this.status = status;
 
-    private String convert(T body) throws IllegalArgumentException, IllegalAccessException{
-        Class<?> classe = body.getClass();
-        Map<String, String> json = new HashMap<>();
-        for(Field field : classe.getFields()){
-            field.setAccessible(true);
-            json.put(field.getName(), (String)field.get(body));
-        }
-
-        // String s = json.entrySet().stream().map((Function<? super Entry<String, String>, ? extends T>) (valor) -> {
-        //     " \\" valor.getKey() \":\"valor.getValue()\""
-
-        // }).collect(Collectors.joining(",\\n"));
-
-
-        return null;
+        return this;
     }
 
-    
+    public int getStatus(){
+        return this.status;
+    }
 }
