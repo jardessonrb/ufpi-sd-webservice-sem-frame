@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 
 import sd.ufpi.core.exceptions.AttributeNotFoundException;
 import sd.ufpi.core.rest.anotations.GetMapping;
+import sd.ufpi.core.rest.anotations.PostMapping;
 import sd.ufpi.core.rest.anotations.RequestMethod;
 import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
 import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
@@ -49,6 +50,8 @@ public class RequestResolver {
         try {
             if(request.getRequestMethod().equals(RequestMethod.GET)){
                 result = executeGET(request, controller);
+            }else if(request.getRequestMethod().equals(RequestMethod.POST)){
+                result = executePOST(request, controller);
             }
 
             Object resultJson = this.jsonParseManager.toJson(result);
@@ -68,17 +71,7 @@ public class RequestResolver {
         if(!this.controllers.containsKey(path)){
             throw new AttributeNotFoundException("Controller is not contain path");
         }
-
         return this.controllers.get(path);
-
-        // Class<?> classe = controller.getClass();
-        // for(Method method : classe.getDeclaredMethods()){
-        //     GetMapping getMapping = method.getAnnotation(GetMapping.class);
-        //     System.out.println("GetMapping Value:" +getMapping.path());
-        // }
-        
-
-        // return null;
     }
 
     private ResponseEntity<?> executeGET(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
@@ -87,21 +80,58 @@ public class RequestResolver {
         for(Method method : controllerClass.getMethods()){
             GetMapping get = method.getAnnotation(GetMapping.class);
             if(get != null){
+                if(get.path().equals("") && request.getPaths().size() == 1){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+
                 List<PathParams> pathParams = this.parse.tranformUriInPathParams(get.path());
                 if(isCorrespondingRequest(request, pathParams)){
                     method.setAccessible(true);
                     Parameter parameters[] = method.getParameters();
-                    
                     Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
-
-                    /*
-                     * method.getParameters() retorna todos os parametros, tem que caçar uma forma de mapear para cada um dele e passar em ordem
-                     */
-                    
                     ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
 
                     return resultado;
+                }
+            }
+        }
 
+        return null;
+    }
+
+    private ResponseEntity<?> executePOST(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
+        Class<?> controllerClass = controller.getClass();
+
+        for(Method method : controllerClass.getMethods()){
+            PostMapping post = method.getAnnotation(PostMapping.class);
+            if(post != null){
+
+                /*
+                 * @Document
+                 * Se não tiver path no PostMapping e a request só tiver um path significa que é o valor default do controller
+                 */
+                if(post.path().equals("") && request.getPaths().size() == 1){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+
+                List<PathParams> pathParams = this.parse.tranformUriInPathParams(post.path());
+                if(isCorrespondingRequest(request, pathParams)){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
                 }
             }
         }

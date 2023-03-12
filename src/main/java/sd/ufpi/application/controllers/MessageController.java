@@ -4,6 +4,7 @@ import sd.ufpi.application.domain.dto.MensagemDTO;
 import sd.ufpi.application.domain.form.MensagemForm;
 import sd.ufpi.core.rest.anotations.GetMapping;
 import sd.ufpi.core.rest.anotations.PathParam;
+import sd.ufpi.core.rest.anotations.PostMapping;
 import sd.ufpi.core.rest.anotations.QueryParam;
 import sd.ufpi.core.rest.anotations.RequestBody;
 import sd.ufpi.core.rest.anotations.RequestMapping;
@@ -35,6 +36,15 @@ public class MessageController {
         ResponseEntity<MensagemDTO> rs = new ResponseEntity<>();
         
         return rs.created(dto);
+    }
+
+
+    @PostMapping
+    public ResponseEntity<MensagemDTO> createMensagem(@RequestBody MensagemForm form){
+        MensagemDTO mensagemDTO = new MensagemDTO();
+        mensagemDTO.setMensagem("Salvou a mensagem");
+        ResponseEntity<MensagemDTO> rs = new ResponseEntity<MensagemDTO>().created(mensagemDTO);
+        return rs;
     }
 }
 
