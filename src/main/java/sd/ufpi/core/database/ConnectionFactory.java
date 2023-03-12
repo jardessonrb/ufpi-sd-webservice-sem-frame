@@ -17,11 +17,23 @@ public class ConnectionFactory {
     public Connection getConnection() throws SQLException, IOException {
         Properties props = getProperties();
 
-        String url = "jdbc:postgresql://localhost:"+props.getProperty("port")+"/"+props.getProperty("name");
+        if(props.getProperty("type").equals("sqlite")){
+            System.out.println("Is "+props.getProperty("type"));
+            this.connection = DriverManager.getConnection("jdbc:sqlite:mail.db");
 
-        this.connection = DriverManager.getConnection(url, props);
+            System.out.println("Conexão realizada");
+            return this.connection;
+        }else {
+            System.out.println("Is "+props.getProperty("type"));
+            String url = "jdbc:postgresql://localhost:"+props.getProperty("port")+"/"+props.getProperty("name");
+    
+            this.connection = DriverManager.getConnection(url, props);
+            System.out.println("Conexão realizada");
+    
+            return this.connection;
 
-        return this.connection;
+        }
+
     }
 
     private Properties getProperties() throws IOException{
