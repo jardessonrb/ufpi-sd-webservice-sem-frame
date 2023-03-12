@@ -3,7 +3,6 @@ package sd.ufpi.core.rest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -34,15 +33,6 @@ public class Root extends RequestResolver implements HttpHandler {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-
-        // System.out.println(exchange.getRequestURI());
-        // System.out.println(exchange.getRequestMethod());
-
-        
-        // String path = splitPath(exchange.getRequestURI());
-        
-        // Object result = getResultExecute(path);
-    
     }
 
     public void addController(Object controller) throws ClassNotController, ClassControllerAlreadyExists{

@@ -11,8 +11,11 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 import sd.ufpi.core.exceptions.AttributeNotFoundException;
+import sd.ufpi.core.rest.anotations.DeleteMapping;
 import sd.ufpi.core.rest.anotations.GetMapping;
+import sd.ufpi.core.rest.anotations.PatchMapping;
 import sd.ufpi.core.rest.anotations.PostMapping;
+import sd.ufpi.core.rest.anotations.PutMapping;
 import sd.ufpi.core.rest.anotations.RequestMethod;
 import sd.ufpi.core.rest.exceptions.ClassControllerAlreadyExists;
 import sd.ufpi.core.rest.exceptions.UnparsedValueForTargetType;
@@ -52,6 +55,12 @@ public class RequestResolver {
                 result = executeGET(request, controller);
             }else if(request.getRequestMethod().equals(RequestMethod.POST)){
                 result = executePOST(request, controller);
+            }else if(request.getRequestMethod().equals(RequestMethod.PUT)){
+                result = executePUT(request, controller);
+            }else if(request.getRequestMethod().equals(RequestMethod.DELETE)){
+                result = executeDELETE(request, controller);
+            }else if(request.getRequestMethod().equals(RequestMethod.PATCH)){
+                result = executePATCH(request, controller);
             }
 
             Object resultJson = this.jsonParseManager.toJson(result);
@@ -125,6 +134,107 @@ public class RequestResolver {
                 }
 
                 List<PathParams> pathParams = this.parse.tranformUriInPathParams(post.path());
+                if(isCorrespondingRequest(request, pathParams)){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private ResponseEntity<?> executePUT(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
+        Class<?> controllerClass = controller.getClass();
+
+        for(Method method : controllerClass.getMethods()){
+            PutMapping put = method.getAnnotation(PutMapping.class);
+            if(put != null){
+                /*
+                 * @Document
+                 * Se não tiver path no PutMapping e a request só tiver um path significa que é o valor default do controller
+                 */
+                if(put.path().equals("") && request.getPaths().size() == 1){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+
+                List<PathParams> pathParams = this.parse.tranformUriInPathParams(put.path());
+                if(isCorrespondingRequest(request, pathParams)){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+            }
+        }
+
+        return null;
+    }
+    private ResponseEntity<?> executePATCH(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
+        Class<?> controllerClass = controller.getClass();
+
+        for(Method method : controllerClass.getMethods()){
+            PatchMapping patch = method.getAnnotation(PatchMapping.class);
+            if(patch != null){
+                /*
+                 * @Document
+                 * Se não tiver path no PutMapping e a request só tiver um path significa que é o valor default do controller
+                 */
+                if(patch.path().equals("") && request.getPaths().size() == 1){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+
+                List<PathParams> pathParams = this.parse.tranformUriInPathParams(patch.path());
+                if(isCorrespondingRequest(request, pathParams)){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private ResponseEntity<?> executeDELETE(Request request, Object controller) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, UnparsedValueForTargetType, ClassNotFoundException, ValueIsRequiredInAnotation{
+        Class<?> controllerClass = controller.getClass();
+
+        for(Method method : controllerClass.getMethods()){
+            DeleteMapping delete = method.getAnnotation(DeleteMapping.class);
+            if(delete != null){
+                /*
+                 * @Document
+                 * Se não tiver path no PutMapping e a request só tiver um path significa que é o valor default do controller
+                 */
+                if(delete.path().equals("") && request.getPaths().size() == 1){
+                    method.setAccessible(true);
+                    Parameter parameters[] = method.getParameters();
+                    Object parametrosMapeado[] = this.mapperParametersManager.parse(request, parameters);
+                    ResponseEntity<?> resultado = (ResponseEntity<?>)method.invoke(controller , parametrosMapeado);
+
+                    return resultado;
+                }
+
+                List<PathParams> pathParams = this.parse.tranformUriInPathParams(delete.path());
                 if(isCorrespondingRequest(request, pathParams)){
                     method.setAccessible(true);
                     Parameter parameters[] = method.getParameters();
