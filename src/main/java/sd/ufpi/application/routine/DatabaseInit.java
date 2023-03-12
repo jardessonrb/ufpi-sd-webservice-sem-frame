@@ -18,14 +18,13 @@ public class DatabaseInit {
 
     public static void initDatabase() throws SQLException, IOException{
         System.out.println("Starting database migrations");
-        Connection connection = new ConnectionFactory().getConnection();
-        DatabaseInit init = new DatabaseInit();
-        init.createTableUser(connection);
-        init.createTableMessage(connection);
-        init.createTableForwardingRecord(connection);
-        // init.createConstraints(connection);
-        init.insertDatas(connection);
-
+        // Connection connection = new ConnectionFactory().getConnection();
+        // DatabaseInit init = new DatabaseInit();
+        // init.createTableUser(connection);
+        // init.createTableMessage(connection);
+        // init.createTableForwardingRecord(connection);
+        // // init.createConstraints(connection);
+        // init.insertDatas(connection);
         System.out.println("Database started ...");
     }
 
@@ -97,9 +96,9 @@ public class DatabaseInit {
     }
 
     private boolean insertDatas(Connection connection) throws SQLException{
-        String insertUser1 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('sistema@sd', '123456')";
-        String insertUser2 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('usuario#1', '123456')";
-        String insertUser3 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('usuario#2', '123456')";
+        String insertUser1 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('sistema', '123456')";
+        String insertUser2 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('usuario1', '123456')";
+        String insertUser3 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('usuario2', '123456')";
 
         PreparedStatement user01 = connection.prepareStatement(insertUser1);
         user01.execute();

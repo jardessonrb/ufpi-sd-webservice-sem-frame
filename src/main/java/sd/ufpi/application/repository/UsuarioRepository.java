@@ -53,13 +53,12 @@ public class UsuarioRepository {
         PreparedStatement statement = this.connection.prepareStatement("select * from tb_usuario where nome_usuario = ? and senha_usuario = ?");
         statement.setString(1, name);
         statement.setString(2, senha);
-
+        
         ResultSet resultado = statement.executeQuery();
         this.connection.close();
-
+        
         if(resultado.next()){
             UsuarioModel usuarioModel = new UsuarioModel();
-
             usuarioModel.setId(new BigInteger(resultado.getString("id")).longValue());
             usuarioModel.setNome(resultado.getString("nome_usuario"));
             usuarioModel.setSenha(resultado.getString("senha_usuario"));
