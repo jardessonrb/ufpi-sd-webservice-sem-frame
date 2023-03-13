@@ -115,5 +115,10 @@ public class MessageController {
         }
     }
 
+    @GetMapping(path = "/teste/nome")
+    public void teste(@QueryParam(name = "nome") String nome){
+        System.out.println("Nome passada: "+nome);
+    }
+
 
 }
