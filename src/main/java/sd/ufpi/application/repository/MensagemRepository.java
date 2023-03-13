@@ -14,6 +14,7 @@ import java.util.List;
 import sd.ufpi.application.domain.enums.SituacaoMensagem;
 import sd.ufpi.application.domain.enums.TipoMensagem;
 import sd.ufpi.application.domain.model.MensagemModel;
+import sd.ufpi.application.domain.model.UsuarioModel;
 import sd.ufpi.core.database.ConnectionFactory;
 import sd.ufpi.core.utils.DatesUtils;
 
@@ -150,7 +151,36 @@ public class MensagemRepository {
         PreparedStatement preparedStatement = this.connection.prepareStatement("select * from tb_mensagem where situacao_mensagem = ? and id_remetente = ? and tipo_mensagem != ?");
         preparedStatement.setString(1, situacao.name());
         preparedStatement.setLong(2, idRemetente);
-        preparedStatement.setString(3, TipoMensagem.RESPOSTA.name());
+        preparedStatement.setString(3, TipoMensagem.ORIGINAL.name());
+        ResultSet resultado = preparedStatement.executeQuery();
+        List<MensagemModel> mensagens = new ArrayList<>();
+        while(resultado.next()){
+            MensagemModel mensagem = new MensagemModel();
+            mensagem.setId(new BigInteger(resultado.getString("id")).longValue());
+            mensagem.setAssunto(resultado.getString("assunto_mensagem"));
+            mensagem.setCorpoMensagem(resultado.getString("corpo_mensagem"));
+            mensagem.setSituacao(SituacaoMensagem.valueOf(resultado.getString("situacao_mensagem")));
+            mensagem.setTipo(TipoMensagem.valueOf(resultado.getString("tipo_mensagem")));
+            mensagem.setHorarioEnvio(DatesUtils.stringToLocalDatetime(resultado.getString("horario_envio")));
+            mensagem.setDestinatario(null);
+            mensagem.setRementente(null);
+            mensagem.setRespostas(new ArrayList<>());
+
+            mensagens.add(mensagem);
+        }
+        this.connection.close();
+        return mensagens;
+    }
+
+    public List<MensagemModel> findByDestinatarioAndSituacao(Long idDestinatario, SituacaoMensagem situacao) throws SQLException, IOException{
+        if(this.connection.isClosed()){
+            this.connection = this.connectionFactory.getConnection();
+        }
+
+        PreparedStatement preparedStatement = this.connection.prepareStatement("select * from tb_mensagem where situacao_mensagem = ? and id_destinatario = ? and tipo_mensagem = ?");
+        preparedStatement.setString(1, situacao.name());
+        preparedStatement.setLong(2, idDestinatario);
+        preparedStatement.setString(3, TipoMensagem.ORIGINAL.name());
         ResultSet resultado = preparedStatement.executeQuery();
         List<MensagemModel> mensagens = new ArrayList<>();
         while(resultado.next()){
@@ -172,6 +202,9 @@ public class MensagemRepository {
     }
 
     public MensagemModel findById(Long idMessage) throws SQLException, IOException{
+        if(this.connection.isClosed()){
+            this.connection = this.connectionFactory.getConnection();
+        }
         PreparedStatement prepared = this.connection.prepareStatement("select * from tb_mensagem where id = ?");
         prepared.setLong(1, idMessage);
         ResultSet mensagemAtualizaResult = prepared.executeQuery();
@@ -233,24 +266,67 @@ public class MensagemRepository {
         return mensagens;
     }
 
+    public List<MensagemModel> findByMensagemEncaminhadasRecebidas(Long idReceptor) throws SQLException, IOException{
+        if(this.connection.isClosed()){
+            this.connection = this.connectionFactory.getConnection();
+        }
+
+        String sql = "select msg.* from tb_mensagem msg "+
+        "join tb_registro_mensagem_encaminhada rg on rg.id_mensagem_original = msg.id "+
+        "join tb_usuario us on rg.id_receptor = us.id "+
+        "where rg.id_receptor = ?";
+        PreparedStatement preparedStatement = this.connection.prepareStatement(sql);
+        preparedStatement.setLong(1, idReceptor);
+        ResultSet resultado = preparedStatement.executeQuery();
+        List<MensagemModel> mensagens = new ArrayList<>();
+        while(resultado.next()){
+            MensagemModel mensagem = new MensagemModel();
+            mensagem.setId(new BigInteger(resultado.getString("id")).longValue());
+            mensagem.setAssunto(resultado.getString("assunto_mensagem"));
+            mensagem.setCorpoMensagem(resultado.getString("corpo_mensagem"));
+            mensagem.setSituacao(SituacaoMensagem.valueOf(resultado.getString("situacao_mensagem")));
+            mensagem.setTipo(TipoMensagem.valueOf(resultado.getString("tipo_mensagem")));
+            mensagem.setHorarioEnvio(DatesUtils.stringToLocalDatetime(resultado.getString("horario_envio")));
+            mensagem.setDestinatario(null);
+            mensagem.setRementente(null);
+            mensagem.setRespostas(new ArrayList<>());
+
+            mensagens.add(mensagem);
+        }
+        this.connection.close();
+        return mensagens;
+    }
+
+    public Boolean excluir(Long idMensagem) throws SQLException, IOException{
+        if(this.connection.isClosed()){
+            this.connection = this.connectionFactory.getConnection();
+        }
+
+        String sql = "update tb_mensagem set id_remetente = 10000 where id =  ?";
+        PreparedStatement preparedStatement = this.connection.prepareStatement(sql);
+        preparedStatement.setLong(1, idMensagem);
+        return preparedStatement.execute();
+    }
+
     public static void main(String[] args) throws SQLException, IOException {
         MensagemRepository repository = new MensagemRepository();
-        // UsuarioModel remetente = new UsuarioModel();
-        // UsuarioModel destinatario = new UsuarioModel();
+        UsuarioModel remetente = new UsuarioModel();
+        UsuarioModel destinatario = new UsuarioModel();
 
-        // remetente.setId(1L);
-        // destinatario.setId(3L);
+        remetente.setId(1L);
+        destinatario.setId(3L);
 
-        // MensagemModel mensagemModel = new MensagemModel();
-        // mensagemModel.setAssunto("Teste de Mensagem");
-        // mensagemModel.setCorpoMensagem("Essa é uma mensagem enviada");
-        // mensagemModel.setSituacao(SituacaoMensagem.ENVIADA);
-        // mensagemModel.setTipo(TipoMensagem.ORIGINAL);
-        // mensagemModel.setDestinatario(destinatario);
-        // mensagemModel.setRementente(remetente);
-        // mensagemModel.setMensagemOriginal(null);
+        MensagemModel mensagemModel = new MensagemModel();
+        mensagemModel.setAssunto("Teste de Mensagem");
+        mensagemModel.setCorpoMensagem("Essa é uma mensagem enviada");
+        mensagemModel.setSituacao(SituacaoMensagem.ENVIADA);
+        mensagemModel.setTipo(TipoMensagem.ORIGINAL);
+        mensagemModel.setDestinatario(destinatario);
+        mensagemModel.setRementente(remetente);
+        mensagemModel.setMensagemOriginal(null);
 
-        // mensagemModel = repository.save(mensagemModel);
+        mensagemModel = repository.save(mensagemModel);
+        System.out.println(mensagemModel.getHorarioEnvio());
         // MensagemModel mensagemModel = repository.updateSituacaoMensagem(1L, SituacaoMensagem.ENCAMINHADA);
         // System.out.println("id da mensagem: "+mensagemModel.getId());
 

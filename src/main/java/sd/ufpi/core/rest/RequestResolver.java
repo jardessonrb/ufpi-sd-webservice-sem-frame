@@ -63,7 +63,7 @@ public class RequestResolver {
                 result = executePATCH(request, controller);
             }
 
-            Object resultJson = this.jsonParseManager.toJson(result);
+            String resultJson = this.jsonParseManager.toJson(result);
             return resultJson;
             
         } catch (Exception e) {

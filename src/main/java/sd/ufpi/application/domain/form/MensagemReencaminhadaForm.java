@@ -12,4 +12,14 @@ public class MensagemReencaminhadaForm {
     public List<Long> getReceptores(){
         return this.idsReceptores;
     }
+
+	public List<Long> getIdsReceptores() {
+		return idsReceptores;
+	}
+
+	public void setIdsReceptores(List<Long> idsReceptores) {
+		this.idsReceptores = idsReceptores;
+	}
+    
+    
 }

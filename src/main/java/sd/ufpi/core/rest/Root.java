@@ -22,12 +22,14 @@ public class Root extends RequestResolver implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         HttpParse parse = new HttpParse();
         Request request = parse.parse(exchange);
-        Object resultado;
+        String resultado;
         try {
-            resultado = resolver(request);
-            exchange.sendResponseHeaders(200, resultado.toString().length());
+            resultado = (String)resolver(request);
+
+            byte[] parsed = resultado.getBytes("UTF8");
+            exchange.sendResponseHeaders(200, parsed.length);
             exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-            exchange.getResponseBody().write(resultado.toString().getBytes());
+            exchange.getResponseBody().write(parsed, 0, parsed.length);
             exchange.close();
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | UnparsedValueForTargetType | ClassNotFoundException | ValueIsRequiredInAnotation e) {
             System.out.println(e.getMessage());

@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import sd.ufpi.application.controllers.UserController;
 import sd.ufpi.application.domain.dto.UsuarioDTO;
 import sd.ufpi.application.domain.form.UsuarioForm;
 import sd.ufpi.application.domain.model.UsuarioModel;
