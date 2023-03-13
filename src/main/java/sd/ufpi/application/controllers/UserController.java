@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import sd.ufpi.application.domain.dto.Sucesso;
 import sd.ufpi.application.domain.dto.UsuarioDTO;
 import sd.ufpi.application.domain.form.UsuarioForm;
 import sd.ufpi.application.service.UsuarioService;
@@ -45,7 +46,13 @@ public class UserController{
         } catch (Exception e) {
             return null;
         }
+    }
 
+    @GetMapping(path = "/bem-vindo")
+    public ResponseEntity<Sucesso> bemvindo() {
+        Sucesso sucesso = new Sucesso();
+        sucesso.setResposta("Seja bem-vindo SD-API-SEM-FRAME");
+        return new ResponseEntity<Sucesso>().created(sucesso);
     }
     
 }

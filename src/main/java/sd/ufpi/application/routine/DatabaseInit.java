@@ -18,13 +18,16 @@ public class DatabaseInit {
 
     public static void initDatabase() throws SQLException, IOException{
         System.out.println("Starting database migrations");
-        // Connection connection = new ConnectionFactory().getConnection();
-        // DatabaseInit init = new DatabaseInit();
-        // init.createTableUser(connection);
-        // init.createTableMessage(connection);
-        // init.createTableForwardingRecord(connection);
-        // // init.createConstraints(connection);
-        // init.insertDatas(connection);
+        try {
+            Connection connection = new ConnectionFactory().getConnection();
+            DatabaseInit init = new DatabaseInit();
+            init.createTableUser(connection);
+            init.createTableMessage(connection);
+            init.createTableForwardingRecord(connection);
+            init.insertDatas(connection);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         System.out.println("Database started ...");
     }
 
@@ -71,29 +74,29 @@ public class DatabaseInit {
         return statement.execute(createTable);
     }
 
-    private void createConstraints(Connection connection) throws SQLException{
-        String foreingKeyRementente = "alter table tb_mensagem add foreign key (id_remetente) references tb_usuario(id)";
-        String foreingKeyDesinatario = "alter table tb_mensagem add foreign key (id_destinatario) references tb_usuario(id)";
-        String foreingKeyMensagemOriginal = "alter table tb_mensagem add foreign key (id_mensagem_original) references tb_mensagem(id)";
-        String foreingKeyRegistroRemetente = "alter table tb_registro_mensagem_encaminhada add foreign key (id_remetente) references tb_usuario(id)";
-        String foreingKeyRegistroReceptor = "alter table tb_registro_mensagem_encaminhada add foreign key (id_receptor) references tb_usuario(id)";
+    // private void createConstraints(Connection connection) throws SQLException{
+    //     String foreingKeyRementente = "alter table tb_mensagem add foreign key (id_remetente) references tb_usuario(id)";
+    //     String foreingKeyDesinatario = "alter table tb_mensagem add foreign key (id_destinatario) references tb_usuario(id)";
+    //     String foreingKeyMensagemOriginal = "alter table tb_mensagem add foreign key (id_mensagem_original) references tb_mensagem(id)";
+    //     String foreingKeyRegistroRemetente = "alter table tb_registro_mensagem_encaminhada add foreign key (id_remetente) references tb_usuario(id)";
+    //     String foreingKeyRegistroReceptor = "alter table tb_registro_mensagem_encaminhada add foreign key (id_receptor) references tb_usuario(id)";
 
         
-        PreparedStatement rementente = connection.prepareStatement(foreingKeyRementente);
-        rementente.executeQuery();
+    //     PreparedStatement rementente = connection.prepareStatement(foreingKeyRementente);
+    //     rementente.executeQuery();
 
-        PreparedStatement desinatario = connection.prepareStatement(foreingKeyDesinatario);
-        desinatario.executeQuery();
+    //     PreparedStatement desinatario = connection.prepareStatement(foreingKeyDesinatario);
+    //     desinatario.executeQuery();
 
-        PreparedStatement mensagemOriginal = connection.prepareStatement(foreingKeyMensagemOriginal);
-        mensagemOriginal.executeQuery();
+    //     PreparedStatement mensagemOriginal = connection.prepareStatement(foreingKeyMensagemOriginal);
+    //     mensagemOriginal.executeQuery();
 
-        PreparedStatement registroRemetente = connection.prepareStatement(foreingKeyRegistroRemetente);
-        registroRemetente.executeQuery();
+    //     PreparedStatement registroRemetente = connection.prepareStatement(foreingKeyRegistroRemetente);
+    //     registroRemetente.executeQuery();
 
-        PreparedStatement registroReceptor = connection.prepareStatement(foreingKeyRegistroReceptor);
-        registroReceptor.executeQuery();
-    }
+    //     PreparedStatement registroReceptor = connection.prepareStatement(foreingKeyRegistroReceptor);
+    //     registroReceptor.executeQuery();
+    // }
 
     private boolean insertDatas(Connection connection) throws SQLException{
         String insertUser1 = "insert into tb_usuario (nome_usuario, senha_usuario) values ('sistema', '123456')";
